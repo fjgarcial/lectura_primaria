@@ -1,7 +1,3 @@
 streamlit
-spacy
-nltk
-textstat
-python-docx
-PyPDF2
-es_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.5.0/es_core_news_sm-3.5.0.tar.gz
+stanza
+PyMuPDF
