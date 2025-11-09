@@ -1,48 +1,38 @@
 import streamlit as st
+import pandas as pd
 import stanza
-import fitz  # PyMuPDF
 
 # Inicializar Stanza para español
-@st.cache_resource
-def load_nlp():
-    stanza.download('es')
-    return stanza.Pipeline(lang='es', processors='tokenize,mwt,pos,lemma')
+stanza.download('es')
+nlp = stanza.Pipeline(lang='es', processors='tokenize,mwt,pos,lemma')
 
-nlp = load_nlp()
-
-# Función para extraer títulos de libros desde libros.pdf
-def extract_book_titles(pdf_path):
-    doc = fitz.open(pdf_path)
-    text = ""
-    for page in doc:
-        text += page.get_text()
-    # Suponemos que cada línea es un título de libro
-    titles = [line.strip() for line in text.split('\n') if line.strip()]
-    return titles
+# Cargar títulos desde libros.csv
+libros_df = pd.read_csv("libros.csv")
+libros = libros_df["Título"].dropna().tolist()
 
 # Función para generar ficha de comprensión lectora
-def generate_comprehension_card(title):
-    doc = nlp(title)
-    num_sentences = len(doc.sentences)
-    num_words = sum(len(sentence.words) for sentence in doc.sentences)
-    keywords = list(set(
-        word.lemma for sentence in doc.sentences for word in sentence.words
-        if word.upos in ['NOUN', 'VERB']
+def generar_ficha(texto):
+    doc = nlp(texto)
+    num_frases = len(doc.sentences)
+    num_palabras = sum(len(sent.words) for sent in doc.sentences)
+    palabras_clave = list(set(
+        word.lemma for sent in doc.sentences for word in sent.words
+        if word.upos in ["NOUN", "VERB"]
     ))
     return {
-        "Número de frases": num_sentences,
-        "Número de palabras": num_words,
-        "Palabras clave": keywords[:10]
+        "Número de frases": num_frases,
+        "Número de palabras": num_palabras,
+        "Palabras clave": palabras_clave[:10]
     }
 
 # Función para análisis pedagógico (simulado)
-def analyze_book(title):
-    return f"📘 El libro '{title}' es adecuado para alumnos de primaria. Su contenido fomenta la lectura comprensiva, el desarrollo del vocabulario y el pensamiento crítico."
+def analizar_libro(titulo):
+    return f"El libro '{titulo}' es adecuado para alumnos de primaria. Promueve la lectura comprensiva, el desarrollo del vocabulario y el pensamiento crítico."
 
 # Función para recomendar libros
-def recommend_books(selected_title, all_titles):
-    recomendaciones = [t for t in all_titles if t.lower() != selected_title.lower()]
-    recomendaciones = recomendaciones[:3]
+def recomendar_libros(titulo, lista):
+    candidatos = [t for t in lista if t.lower() != titulo.lower()]
+    recomendaciones = candidatos[:3]
     pros_contras = {
         t: {
             "Pros": ["Estimula la imaginación", "Lenguaje enriquecido", "Temas educativos"],
@@ -55,33 +45,30 @@ def recommend_books(selected_title, all_titles):
 st.set_page_config(page_title="Buscador Pedagógico de Libros", layout="centered")
 st.title("📚 Buscador y análisis pedagógico de libros")
 
-# Cargar títulos desde libros.pdf
-libros_pdf_path = "libros.pdf"
-libros_disponibles = extract_book_titles(libros_pdf_path)
-
 # Entrada del usuario
 titulo = st.text_input("🔍 Introduce el título del libro que quieres analizar")
 
 if titulo:
-    if titulo in libros_disponibles:
-        st.success(f"✅ Libro encontrado: {titulo}")
+    coincidencias = [t for t in libros if titulo.lower() in t.lower()]
+    if coincidencias:
+        seleccionado = coincidencias[0]
+        st.success(f"✅ Libro encontrado: {seleccionado}")
 
         # Análisis pedagógico
         st.subheader("🧠 Análisis pedagógico")
-        st.write(analyze_book(titulo))
+        st.write(analizar_libro(seleccionado))
 
         # Ficha de comprensión lectora
         st.subheader("📋 Ficha de comprensión lectora")
-        ficha = generate_comprehension_card(titulo)
+        ficha = generar_ficha(seleccionado)
         st.json(ficha)
 
         # Recomendaciones
         st.subheader("📈 Recomendaciones para avanzar")
-        recomendaciones, pros_contras = recommend_books(titulo, libros_disponibles)
+        recomendaciones, pros_contras = recomendar_libros(seleccionado, libros)
         for libro in recomendaciones:
             st.markdown(f"### {libro}")
             st.markdown(f"**Pros:** {', '.join(pros_contras[libro]['Pros'])}")
             st.markdown(f"**Contras:** {', '.join(pros_contras[libro]['Contras'])}")
     else:
-        st.error("❌ Libro no encontrado en el archivo libros.pdf. Verifica el título.")
-
+        st.error("❌ No se encontró el título en libros.csv. Verifica el texto o intenta con otra palabra clave.")
