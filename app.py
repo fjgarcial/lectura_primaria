@@ -20,7 +20,7 @@ except:
     st.error("El modelo de spaCy 'es_core_news_sm' no está instalado. Añádelo en requirements.txt.")
 
 # Leer listado de libros desde el PDF
-reader = PdfReader("Listado_100_Libros_Infantiles.pdf")
+reader = PdfReader("libros.pdf")
 libros = []
 for page in reader.pages:
     libros += page.extract_text().split("\n")
@@ -102,3 +102,4 @@ if texto_libro:
         file_name="informe_lectura.docx",
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
+
