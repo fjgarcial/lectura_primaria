@@ -84,3 +84,4 @@ if titulo:
             st.markdown(f"**Contras:** {', '.join(pros_contras[libro]['Contras'])}")
     else:
         st.error("❌ Libro no encontrado en el archivo libros.pdf. Verifica el título.")
+
