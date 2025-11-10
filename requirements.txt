@@ -4,5 +4,4 @@ numpy
 python-docx
 openai
 stanza
-streamlit-extras
 sqlalchemy
