@@ -1,20 +1,15 @@
-
 import streamlit as st
-from streamlit_extras.switch_page_button import switch_page
 
-st.set_page_config(page_title='Lectura Primaria', layout='wide')
-st.markdown('## 📚 Elige una de las opciones')
+st.set_page_config(page_title="Lectura Primaria", layout="wide")
+st.markdown("## 📚 Elige una de las opciones")
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    if st.button('🔍 Busca libros'):
-        switch_page('1_busqueda_libros')
+    st.page_link("pages/1_Busca_libros.py", label="🔍 Busca libros", icon="🔍")
 
 with col2:
-    if st.button('📖 Análisis pedagógico y Recomendaciones'):
-        switch_page('2_analisis_pedagogico')
+    st.page_link("pages/2_Analisis_pedagogico.py", label="📖 Análisis pedagógico y Recomendaciones", icon="📖")
 
 with col3:
-    if st.button('📊 Progreso de alumnos'):
-        switch_page('3_progreso_alumnos')
+    st.page_link("pages/3_Progreso_alumnos.py", label="📊 Progreso de alumnos", icon="📊")
