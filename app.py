@@ -6,7 +6,6 @@ import docx
 from io import BytesIO
 import os
 
-# Cargar modelo de Stanza
 @st.cache_resource
 def cargar_stanza():
     if not os.path.exists(os.path.expanduser('~/stanza_resources/es')):
@@ -15,7 +14,6 @@ def cargar_stanza():
 
 nlp = cargar_stanza()
 
-# Análisis lingüístico con Stanza
 def analizar_libro_con_stanza(texto):
     doc = nlp(texto)
     palabras = sum(len(sent.words) for sent in doc.sentences)
@@ -37,7 +35,6 @@ def analizar_libro_con_stanza(texto):
         "tiempos": list(tiempos)[:3]
     }
 
-# Generar ficha .docx
 def generar_ficha(titulo, analisis):
     doc = docx.Document()
     doc.add_heading(f'Ficha de comprensión lectora: {titulo}', 0)
@@ -55,7 +52,6 @@ Preguntas sugeridas:")
     doc.save(buffer)
     return buffer
 
-# Generar rúbrica .docx
 def generar_rubrica(titulo):
     doc = docx.Document()
     doc.add_heading(f'Rúbrica de evaluación: {titulo}', 0)
@@ -69,7 +65,6 @@ def generar_rubrica(titulo):
     doc.save(buffer)
     return buffer
 
-# Recomendaciones
 @st.cache_data
 def recomendar_libros(csv_path="libros_titulo.csv"):
     try:
@@ -88,7 +83,6 @@ def recomendar_libros(csv_path="libros_titulo.csv"):
         st.error(f"Error al cargar recomendaciones: {e}")
         return []
 
-# Interfaz
 st.set_page_config(page_title="Análisis pedagógico", layout="centered")
 st.title("📚 Análisis pedagógico y Recomendaciones")
 
