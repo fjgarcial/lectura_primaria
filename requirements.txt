@@ -1,7 +1,0 @@
-streamlit
-pandas
-numpy
-python-docx
-openai
-stanza
-sqlalchemy
